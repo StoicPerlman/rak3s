@@ -1,0 +1,24 @@
+---
+- name: Test for k3s binary
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_bin
+
+- name: Test for k3s master uninstall script
+  stat:
+    path: /usr/local/bin/k3s-uninstall.sh
+  register: k3s_master_script
+
+- name: Test for k3s worker uninstall script
+  stat:
+    path: /usr/local/bin/k3s-agent-uninstall.sh
+  register: k3s_worker_script
+
+- name: Uninstall k3s master
+  shell: /usr/local/bin/k3s-uninstall.sh
+  when: k3s_bin.stat.exists and k3s_master_script.stat.exists
+
+- name: Uninstall k3s worker node
+  shell: /usr/local/bin/k3s-agent-uninstall.sh
+  when: k3s_bin.stat.exists and k3s_worker_script.stat.exists
+

@@ -1,0 +1,31 @@
+---
+- name: Test for k3s binary
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_bin
+
+# Single master config
+- name: k3s binary missing
+  when: not k3s_bin.stat.exists
+  block:
+  - name: Install k3s single master
+    shell: curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -
+    args:
+      warn: False
+    when: groups['masters'] | length == 1
+
+  # Multiple HA masters config
+  - name: Install k3s - first HA master
+    shell: curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server --cluster-init
+    args:
+      warn: False
+    when: groups['masters'] | length > 1
+
+- name: Read node-token from master
+  slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  register: node_token
+
+- name: Store master node-token
+  set_fact:
+    token: "{{ node_token.content | b64decode | trim }}"

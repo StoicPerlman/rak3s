@@ -1,0 +1,27 @@
+---
+- name: Test for k3s binary
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_bin
+
+
+# Throws errors but still joins cluster ok. We will wait a minute then check if its running
+- name: k3s binary missing
+  when: not k3s_bin.stat.exists
+  block:
+  - name: Install k3s
+    shell: curl -sfL https://get.k3s.io | \
+              INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server --token {{ token }} --server https://{{ groups['masters'][0] }}:6443
+    args:
+      warn: False
+    ignore_errors: True
+
+  - name: Let HA master start up
+    pause:
+      minutes: 1
+
+- name: Make sure k3s started on HA masters
+  systemd:
+    state: started
+    name: k3s
+

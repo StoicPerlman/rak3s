@@ -1,0 +1,12 @@
+---
+- name: Test for k3s binary
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_bin
+
+- name: Install k3s
+  shell: curl -sfL https://get.k3s.io | \
+          INSTALL_K3S_VERSION={{ k3s_version }} K3S_URL=https://{{ groups['masters'][0] }}:6443 K3S_TOKEN={{ token }} sh -
+  when: not k3s_bin.stat.exists
+  args:
+    warn: False

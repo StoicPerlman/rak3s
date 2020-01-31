@@ -1,0 +1,7 @@
+- hosts: all
+  vars_prompt:
+    - name: "pi_pass"
+      prompt: "New password for pi user (blank for random)"
+      private: yes
+  roles:
+    - auth

@@ -1,0 +1,50 @@
+---
+- name: Check existing config
+  stat:
+    path: ~/.kube/config
+  register: local_config
+  delegate_to: localhost
+  run_once: True
+  become: False
+
+- name: Check existing config
+  stat:
+    path: ~/.kube/config.rak3s
+  register: local_k3s_config
+  delegate_to: localhost
+  run_once: True
+  become: False
+
+- name: Set config path
+  set_fact:
+    k3s_config: "{{ (local_config.stat.exists) | ternary('~/.kube/config.rak3s', '~/.kube/config') }}"
+
+- name: Fetch kubeconfig file
+  fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ k3s_config }}"
+    flat: yes
+  when: not local_config.stat.exists or not local_k3s_config.stat.exists
+
+
+- name: Updating url in kubeconfig
+  replace:
+    path: "{{ k3s_config }}"
+    regexp: ': https://127.0.0.1:6443$'
+    replace: ': https://{{ ansible_default_ipv4.address }}:6443'
+  delegate_to: localhost
+  run_once: True
+  become: False
+  when: not local_config.stat.exists or not local_k3s_config.stat.exists
+
+- name: Updating names in kubeconfig
+  replace:
+    path: "{{ k3s_config }}"
+    regexp: ': default$'
+    replace: ': rak3s'
+  delegate_to: localhost
+  run_once: True
+  become: False
+  when: not local_config.stat.exists or not local_k3s_config.stat.exists
+
+
