@@ -31,6 +31,8 @@ Inspired by the work done on [rak8s](https://github.com/rak8s/rak8s) and [k3s-an
 
 ## FYI
 
+k3s in a HA setup is experimental. This will deploy and work, but I have had all masters stop working a couple days after setup. Use HA setup with caution for now. See [HA Docs](https://rancher.com/docs/k3s/latest/en/installation/ha-embedded/) for more info
+
 k3s version is hard coded in group_vars/all.yaml. Please change this to the latest version, and if it works open a PR. I only have one cluster, so I won't always be able to be on top of the latest and greatest. Please test with a single master and an HA setup before doing a PR. Its easy to uninstall and test both before finalizing your setup (see uninstall instructions below).
 
 My setup:
