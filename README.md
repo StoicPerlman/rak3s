@@ -9,14 +9,14 @@ Inspired by the work done on [rak8s](https://github.com/rak8s/rak8s) and [k3s-an
 - [Why](#why)
 - [FYI](#fyi)
 - [Preflight](#preflight)
-  - [Modify ansible.cfg and inventory](#modify-ansiblecfg-and-inventory)
+  - [Modify for your environment](#modify-for-your-environment)
   - [DNS](#dns)
   - [Copy ssh private key](#copy-ssh-private-key)
   - [Change default pass](#change-default-pass)
   - [Apt update](#apt-update)
 - [Install](#install)
   - [Get kube config](#get-kube-config)
-- [Update](#update)
+- [Add more nodes](#add-more-nodes)
   - [Add worker nodes](#add-worker-nodes)
   - [Add master nodes](#add-master-nodes)
 - [Uninstall](#uninstall)
@@ -47,7 +47,7 @@ As of version v1.17.2+k3s1 you may see an error while installing an HA setup, yo
 
 Each of these should be run once for initial setup. Can be run as needed later.
 
-### Modify ansible.cfg, hosts.ini, and group_vars/all.yaml
+### Modify for your environment
 
 Modify the hosts.ini file to suit your environment. Change the names to your liking and the IPs to the addresses of your Raspberry Pis.
 
