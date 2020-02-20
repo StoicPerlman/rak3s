@@ -1,1 +1,2 @@
 k3s_version: v1.17.2+k3s1
+# k3s_server_extra_args: --no-deploy servicelb

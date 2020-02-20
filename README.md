@@ -47,11 +47,13 @@ As of version v1.17.2+k3s1 you may see an error while installing an HA setup, yo
 
 Each of these should be run once for initial setup. Can be run as needed later.
 
-### Modify ansible.cfg and hosts.ini
+### Modify ansible.cfg, hosts.ini, and group_vars/all.yaml
 
 Modify the hosts.ini file to suit your environment. Change the names to your liking and the IPs to the addresses of your Raspberry Pis.
 
 If your SSH user on the Raspberry Pis is not the Raspbian default (pi) modify remote_user in the ansible.cfg.
+
+In group_vars/all.yaml you can specify the k3s version and [extra args](https://rancher.com/docs/k3s/latest/en/installation/install-options/#registration-options-for-the-k3s-server) for the server install script.
 
 ### DNS
 

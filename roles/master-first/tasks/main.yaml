@@ -9,14 +9,16 @@
   when: not k3s_bin.stat.exists
   block:
   - name: Install k3s single master
-    shell: curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -
+    shell: curl -sfL https://get.k3s.io | \
+              INSTALL_K3S_VERSION={{ k3s_version }} sh - server {{ k3s_server_extra_args | default('') }}
     args:
       warn: False
     when: groups['masters'] | length == 1
 
   # Multiple HA masters config
   - name: Install k3s - first HA master
-    shell: curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server --cluster-init
+    shell: curl -sfL https://get.k3s.io | \
+              INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server --cluster-init {{ k3s_server_extra_args | default('') }}
     args:
       warn: False
     when: groups['masters'] | length > 1

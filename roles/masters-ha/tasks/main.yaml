@@ -11,7 +11,8 @@
   block:
   - name: Install k3s
     shell: curl -sfL https://get.k3s.io | \
-              INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server --token {{ token }} --server https://{{ groups['masters'][0] }}:6443
+              INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server \
+              --token {{ token }} --server https://{{ groups['masters'][0] }}:6443 {{ k3s_server_extra_args | default('') }}
     args:
       warn: False
     ignore_errors: True
