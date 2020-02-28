@@ -1,2 +1,2 @@
 k3s_version: v1.17.3+k3s1
-# k3s_server_extra_args: --no-deploy servicelb --node-taint k3s-controlplane=true:NoExecute
+# k3s_server_extra_args: --no-deploy servicelb --node-taint k3s-controlplane=true:NoExecute --tls-san 192.168.1.20 --tls-san rak3s.local.lan
