@@ -53,7 +53,7 @@ Modify the hosts.ini file to suit your environment. Change the names to your lik
 
 If your SSH user on the Raspberry Pis is not the Raspbian default (pi) modify remote_user in the ansible.cfg.
 
-In group_vars/all.yaml you can specify the k3s version and [extra args](https://rancher.com/docs/k3s/latest/en/installation/install-options/#registration-options-for-the-k3s-server) for the server install script.
+In group_vars/all.yaml you can specify the k3s version and [extra args](https://rancher.com/docs/k3s/latest/en/installation/install-options/#registration-options-for-the-k3s-server) for the server install script. Check out the commented out examples of the extra args I use.
 
 ### DNS
 
@@ -83,11 +83,13 @@ Runs apt update and upgrade on all machines. Can take a while.
 
 ## Install
 
+    ansible-playbook install.yaml
+
 If you want an HA setup with multiple masters you must go into hosts.ini and uncomment the extra master nodes.
 
 Make sure you have an odd number of masters!
 
-    ansible-playbook install.yaml
+You may want to put a load balancer like HA proxy infront of your api servers on the master nodes. If so you should edit the k3s_server_extra_args in group_vars/all.yaml and add the --tls-san arg with the ip/hostname of the haproxy, then update your kubeconfig to use this ip/hostname.
 
 ### Get kube config
 
