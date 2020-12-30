@@ -32,10 +32,11 @@ The latest versions of this has moved all the heavy lifting to [k3sup](https://g
 - k3s-ansible targets multiple platforms, this is only for Raspberry Pis
 - rak8s used Kubernetes, this uses k3s
 - Neither support high availability deployments, this does
+- k3sup is awesome, but there are some preflight tasks to be done on Raspberry Pis
 
 ## FYI
 
-My setup is currently all pi 4 with 4 gb ram
+My setup is currently all Pi 4s with 4 GB of ram.
 
 As of version v1.17.2+k3s1 you may see an error while installing an HA setup, you can ignore it. The playbook will pause for one minute then check that the service is running ok. If you are able to see all the nodes after the playbook finishes then all is well.
 
