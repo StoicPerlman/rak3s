@@ -1,7 +1,0 @@
----
-# Gets token from master fact and adds fact for all hosts
-- name: Get master node-token
-  set_fact:
-    token: "{{ token }}"
-  delegate_to: masters[0]
-  run_once: true

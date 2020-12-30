@@ -6,22 +6,26 @@ Stand up a Raspberry Pi based k3s Kubernetes cluster with Ansible.
 
 Inspired by the work done on [rak8s](https://github.com/rak8s/rak8s) and [k3s-ansible](https://github.com/itwars/k3s-ansible).
 
-- [Why](#why)
-- [FYI](#fyi)
-- [Preflight](#preflight)
-  - [Modify for your environment](#modify-for-your-environment)
-  - [DNS](#dns)
-  - [Copy ssh private key](#copy-ssh-private-key)
-  - [Change default pass](#change-default-pass)
-  - [Apt update](#apt-update)
-- [Install](#install)
-  - [Get kube config](#get-kube-config)
-- [Add more nodes](#add-more-nodes)
-  - [Add worker nodes](#add-worker-nodes)
-  - [Add master nodes](#add-master-nodes)
-- [Uninstall](#uninstall)
-  - [Complete Uninstall](#complete-uninstall)
-  - [Remove a single node](#remove-a-single-node)
+The latest versions of this has moved all the heavy lifting to [k3sup](https://github.com/alexellis/k3sup). Install this on your local machine first.
+
+- [rak3s - 5 less than rak8s](#rak3s---5-less-than-rak8s)
+  - [Why](#why)
+  - [FYI](#fyi)
+  - [Preflight](#preflight)
+    - [Install k3sup](#install-k3sup)
+    - [Modify for your environment](#modify-for-your-environment)
+    - [DNS](#dns)
+    - [Copy ssh private key](#copy-ssh-private-key)
+    - [Change default pass](#change-default-pass)
+    - [Apt update](#apt-update)
+  - [Install](#install)
+    - [Get kube config](#get-kube-config)
+  - [Add more nodes](#add-more-nodes)
+    - [Add worker nodes](#add-worker-nodes)
+    - [Add master nodes](#add-master-nodes)
+  - [Uninstall](#uninstall)
+    - [Complete Uninstall](#complete-uninstall)
+    - [Remove a single node](#remove-a-single-node)
 
 ## Why
 
@@ -31,15 +35,7 @@ Inspired by the work done on [rak8s](https://github.com/rak8s/rak8s) and [k3s-an
 
 ## FYI
 
-k3s in a HA setup is experimental. This will deploy and work, but I have had all masters stop working a couple days after setup. Use HA setup with caution for now. See [HA Docs](https://rancher.com/docs/k3s/latest/en/installation/ha-embedded/) for more info
-
-k3s version is hard coded in group_vars/all.yaml. Please change this to the latest version, and if it works open a PR. I only have one cluster, so I won't always be able to be on top of the latest and greatest. Please test with a single master and an HA setup before doing a PR. Its easy to uninstall and test both before finalizing your setup (see uninstall instructions below).
-
-My setup:
-
-- 1 master is a pi 3 b
-- 2 masters are pi 3 b+
-- 3 workers are pi 4 with 4 gb ram
+My setup is currently all pi 4 with 4 gb ram
 
 As of version v1.17.2+k3s1 you may see an error while installing an HA setup, you can ignore it. The playbook will pause for one minute then check that the service is running ok. If you are able to see all the nodes after the playbook finishes then all is well.
 
@@ -47,13 +43,17 @@ As of version v1.17.2+k3s1 you may see an error while installing an HA setup, yo
 
 Each of these should be run once for initial setup. Can be run as needed later.
 
+### Install k3sup
+
+Install k3sup using brew or [these instructions](https://github.com/alexellis/k3sup#download-k3sup-tldr)
+
 ### Modify for your environment
 
 Modify the hosts.ini file to suit your environment. Change the names to your liking and the IPs to the addresses of your Raspberry Pis.
 
 If your SSH user on the Raspberry Pis is not the Raspbian default (pi) modify remote_user in the ansible.cfg.
 
-In group_vars/all.yaml you can specify the k3s version and [extra args](https://rancher.com/docs/k3s/latest/en/installation/install-options/#registration-options-for-the-k3s-server) for the server install script. Check out the commented out examples of the extra args I use.
+In group_vars/all.yaml you can specify [k3sup extra args](https://github.com/alexellis/k3sup#usage-) and [k3s extra args](https://rancher.com/docs/k3s/latest/en/installation/install-options/#registration-options-for-the-k3s-server) for the server install script. Check out the commented out examples of the extra args I use.
 
 ### DNS
 
@@ -83,7 +83,9 @@ Runs apt update and upgrade on all machines. Can take a while.
 
 ## Install
 
-    ansible-playbook install.yaml
+    ansible-playbook --ask-become-pass install.yaml
+
+This will ask for the sudo password (required by k3sup) for your local machine.
 
 If you want an HA setup with multiple masters you must go into hosts.ini and uncomment the extra master nodes.
 
@@ -94,24 +96,11 @@ You may want to put a load balancer like HA proxy infront of your api servers on
 ### Get kube config
 
 The kubeconfig file is saved automatically on install.
-The default path is ~/.kube/config if that file does not exist, or ~/.kube/config.rak3s if it does.
+The default path is ~/.kube/config. If this file exists the rak3s config will be merged in, you must change the context manually.
 
 If you need to redownload the kubeconfig you can run the following at any time.
 
     ansible-playbook kubeconfig.yaml
-
-If you had an existing kubeconfig you can merge ~/.kube/config.rak3s into ~/.kube/config with the following.
-
-    KUBECONFIG=~/.kube/config.rak3s:~/.kube/config
-    kubectl config view --flatten > ~/.kube/config.tmp
-    mv ~/.kube/config.tmp ~/.kube/config
-    rm ~/.kube/config.rak3s
-
-Or better yet install [konfig](https://github.com/corneliusweig/konfig) using [krew](https://github.com/kubernetes-sigs/krew)
-
-    kubectl krew install konfig
-    kubectl konfig import --save ~/.kube/config.rak3s
-    rm ~/.kube/config.rak3s
 
 ## Add more nodes
 

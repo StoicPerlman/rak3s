@@ -5,8 +5,10 @@
   register: k3s_bin
 
 - name: Install k3s
-  shell: curl -sfL https://get.k3s.io | \
-          INSTALL_K3S_VERSION={{ k3s_version }} K3S_URL=https://{{ groups['masters'][0] }}:6443 K3S_TOKEN={{ token }} sh -
+  delegate_to: localhost
+  become_user: "{{ lookup('env', 'USER') }}"
+  shell: k3sup join --server-user {{ ansible_user }} \
+          --server-ip {{ hostvars[groups['masters'][0]]['ansible_default_ipv4']['address'] }} \
+          --user {{ ansible_user }} --ip {{ ansible_default_ipv4.address }} \
+          {{ k3sup_extra_args | default('') }}
   when: not k3s_bin.stat.exists
-  args:
-    warn: False

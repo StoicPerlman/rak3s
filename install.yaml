@@ -6,10 +6,6 @@
   roles:
     - master-first
 
-- hosts: all
-  roles:
-    - get-token
-
 - hosts: masters[1:]
   roles:
     - masters-ha
@@ -17,7 +13,3 @@
 - hosts: workers
   roles:
     - workers
-
-- hosts: masters[0]
-  roles:
-    - kubeconfig

@@ -7,27 +7,18 @@
 # Single master config
 - name: k3s binary missing
   when: not k3s_bin.stat.exists
+  delegate_to: localhost
+  become_user: "{{ lookup('env', 'USER') }}"
   block:
   - name: Install k3s single master
-    shell: curl -sfL https://get.k3s.io | \
-              INSTALL_K3S_VERSION={{ k3s_version }} sh - server {{ k3s_server_extra_args | default('') }}
-    args:
-      warn: False
+    shell: k3sup install {{ kube_config_args }} \
+            --user {{ ansible_user }} --ip {{ ansible_default_ipv4.address }} \
+            {{ k3sup_extra_args | default('') }} {{ k3s_server_extra_args | default('') }}
     when: groups['masters'] | length == 1
 
   # Multiple HA masters config
   - name: Install k3s - first HA master
-    shell: curl -sfL https://get.k3s.io | \
-              INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server --cluster-init {{ k3s_server_extra_args | default('') }}
-    args:
-      warn: False
+    shell: k3sup install --cluster {{ kube_config_args }} \
+            --user {{ ansible_user }} --ip {{ ansible_default_ipv4.address }} \
+            {{ k3sup_extra_args | default('') }} {{ k3s_server_extra_args | default('') }}
     when: groups['masters'] | length > 1
-
-- name: Read node-token from master
-  slurp:
-    src: /var/lib/rancher/k3s/server/node-token
-  register: node_token
-
-- name: Store master node-token
-  set_fact:
-    token: "{{ node_token.content | b64decode | trim }}"

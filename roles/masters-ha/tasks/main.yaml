@@ -8,11 +8,14 @@
 # Throws errors but still joins cluster ok. We will wait a minute then check if its running
 - name: k3s binary missing
   when: not k3s_bin.stat.exists
+  delegate_to: localhost
+  become_user: "{{ lookup('env', 'USER') }}"
   block:
   - name: Install k3s
-    shell: curl -sfL https://get.k3s.io | \
-              INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server \
-              --token {{ token }} --server https://{{ groups['masters'][0] }}:6443 {{ k3s_server_extra_args | default('') }}
+    shell: k3sup join --server --server-user {{ ansible_user }} \
+            --server-ip {{ hostvars[groups['masters'][0]]['ansible_default_ipv4']['address'] }}
+            --user {{ ansible_user }} --ip {{ ansible_default_ipv4.address }} \
+            {{ k3sup_extra_args | default('') }} {{ k3s_server_extra_args | default('') }}
     args:
       warn: False
     ignore_errors: True
